@@ -9,8 +9,6 @@ import (
 var wg sync.WaitGroup
 
 type Fetcher interface {
-	// Fetch returns the body of URL and
-	// a slice of URLs found on that page.
 	Fetch(url string) (body string, urls []string, err error)
 }
 
@@ -34,9 +32,6 @@ func (m *SafeUrlMap) Add(url string) {
 
 	m.v[url] = true
 }
-
-// Crawl uses fetcher to recursively crawl
-// pages starting with url, to a maximum of depth.
 
 var urlMap = SafeUrlMap{v: make(map[string]bool)}
 
@@ -71,7 +66,6 @@ func main() {
 	time.Sleep(time.Second)
 }
 
-// fakeFetcher is Fetcher that returns canned results.
 type fakeFetcher map[string]*fakeResult
 
 type fakeResult struct {
@@ -86,7 +80,6 @@ func (f fakeFetcher) Fetch(url string) (string, []string, error) {
 	return "", nil, fmt.Errorf("not found: %s", url)
 }
 
-// fetcher is a populated fakeFetcher.
 var fetcher = fakeFetcher{
 	"https://golang.org/": &fakeResult{
 		"The Go Programming Language",

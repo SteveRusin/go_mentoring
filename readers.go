@@ -6,8 +6,6 @@ import (
 
 type MyReader struct{}
 
-// TODO: Add a Read([]byte) (int, error) method to MyReader.
-
 func (v MyReader) Read(b []byte) (int, error) {
 	b[0] = 'A'
 
