@@ -9,13 +9,13 @@ To use this package in your Go project, follow the steps below:
 1. Install the package in your project:
 
    ```bash
-   go get github.com/SteveRusin/go_mentoring/hasher
+   go get github.com/SteveRusin/go_mentoring@0.0.2
    ```
 
 2. Import the package in your code:
 
    ```go
-   import "github.com/SteveRusin/go_mentoring/hasher"
+   import "github.com/SteveRusin/go_mentoring/pkg/hasher"
    ```
 
 3. Hash a password:
@@ -44,7 +44,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/SteveRusin/go_mentoring/hasher"
+	"github.com/SteveRusin/go_mentoring/pkg/hasher"
 )
 
 func main() {
