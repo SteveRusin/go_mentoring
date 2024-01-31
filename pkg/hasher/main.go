@@ -22,7 +22,7 @@ SOFTWARE.
 package hasher
 
 /*
-  Hasesh password
+  Hashes password
   Usage:
     import "github.com/SteveRusin/go_mentoring/hasher"
     hasher.HashPassword("password")
@@ -32,7 +32,7 @@ func HashPassword(password string) (string, error) {
 }
 
 /*
-  Hasesh password
+  Verifies password hash
   Usage:
     import "github.com/SteveRusin/go_mentoring/hasher"
     hasher.HashPassword("password")
