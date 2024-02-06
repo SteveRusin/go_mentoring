@@ -42,7 +42,7 @@ func TestShouldFindAllMessages(t *testing.T) {
 }
 
 func TestShouldReturnErrorIfMessageNotFound(t *testing.T) {
-  setUp()
+	setUp()
 	_, err := messageRepository.findAll("111")
 
 	if fmt.Sprint(err) != "user 111 does not have messages" {
