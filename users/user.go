@@ -22,14 +22,24 @@ func NewUserRepository() *UserRepository {
 	}
 }
 
-func (repo *UserRepository) Save(user User) (*UserRepository, error) {
+func (repo *UserRepository) Save(user User) (*User, error) {
   if repo.db == nil {
     return nil, errors.New("database not initialized")
   }
 
+  if user.Name == "" {
+    return nil, errors.New("User name cannot be empty")
+  }
+
+  savedUser, _ := repo.FindByUsername(user.Name)
+
+  if savedUser != nil {
+    return savedUser, nil
+  }
+
 	repo.db[user.Id] = user
 
-	return repo, nil
+	return &user, nil
 }
 
 func (repo *UserRepository) FindByUsername(name string) (*User, error) {
