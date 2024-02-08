@@ -14,6 +14,11 @@ type UserRepository struct {
 	db UserDb
 }
 
+type UserCreds struct {
+  Name string
+  Password string
+}
+
 func NewUserRepository() *UserRepository {
 	var usersDb UserDb = make(map[string]User)
 
@@ -54,4 +59,14 @@ func (repo *UserRepository) FindByUsername(name string) (*User, error) {
 	}
 
 	return nil, errors.New("User not found")
+}
+
+func (repo *UserRepository) FindUserByCreds(creds *UserCreds) (*User, error) {
+  user, err := repo.FindByUsername(creds.Name)
+
+  if err != nil || user.Password != creds.Password {
+    return nil, errors.New("Wrong username or password")
+  }
+
+  return user, nil
 }
