@@ -1,8 +1,12 @@
 package users
 
-import "errors"
+import (
+	"errors"
+	"sync"
+)
 
 type UserDb map[string]User
+var mutex *sync.Mutex = &sync.Mutex{}
 
 type User struct {
 	Id       string
@@ -42,6 +46,8 @@ func (repo *UserRepository) Save(user User) (*User, error) {
     return savedUser, nil
   }
 
+  mutex.Lock()
+  defer mutex.Unlock()
 	repo.db[user.Id] = user
 
 	return &user, nil
@@ -51,6 +57,9 @@ func (repo *UserRepository) FindByUsername(name string) (*User, error) {
 	if name == "" {
 		return nil, errors.New("User name cannot be empty")
 	}
+
+  mutex.Lock()
+  defer mutex.Unlock()
 
 	for _, v := range repo.db {
 		if v.Name == name {
