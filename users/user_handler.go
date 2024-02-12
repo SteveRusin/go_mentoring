@@ -28,12 +28,20 @@ var usersRepository = NewUserRepository()
 
 func HandleUser(w http.ResponseWriter, r *http.Request) {
 	if r.Method != "POST" {
-		fmt.Fprintf(w, "404 Method not found\n")
+		w.WriteHeader(http.StatusNotImplemented)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
 	registerUserDto := RegisterUserDto{}
-	json.NewDecoder(r.Body).Decode(&registerUserDto)
+	decodeErr := json.NewDecoder(r.Body).Decode(&registerUserDto)
+
+	if decodeErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Bad request\n"))
+
+		return
+	}
 
 	userToSave := User{
 		Id:       randomId.New(),
@@ -64,12 +72,21 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	loginUserDto := LoginUserDto{}
-	json.NewDecoder(r.Body).Decode(&loginUserDto)
+
+	decodeErr := json.NewDecoder(r.Body).Decode(&loginUserDto)
+
+	if decodeErr != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		w.Write([]byte("Invalid username/password\n"))
+
+		return
+	}
 
 	_, err := usersRepository.FindUserByCreds(&UserCreds{
 		Name:     loginUserDto.UserName,
 		Password: loginUserDto.Password,
 	})
+
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		w.Write([]byte("Invalid username/password\n"))
