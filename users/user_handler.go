@@ -2,9 +2,9 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
+	"github.com/SteveRusin/go_mentoring/middlewares"
 	"github.com/SteveRusin/go_mentoring/randomId"
 )
 
@@ -26,10 +26,9 @@ type LoginUserResponse struct {
 
 var usersRepository = NewUserRepository()
 
-func HandleUser(w http.ResponseWriter, r *http.Request) {
+func HandleUser(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
 	if r.Method != "POST" {
-		w.WriteHeader(http.StatusNotImplemented)
-		return
+		return middlewares.NewNotImplementedError()
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -37,10 +36,7 @@ func HandleUser(w http.ResponseWriter, r *http.Request) {
 	decodeErr := json.NewDecoder(r.Body).Decode(&registerUserDto)
 
 	if decodeErr != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Bad request\n"))
-
-		return
+		return middlewares.NewBadRequestError()
 	}
 
 	userToSave := User{
@@ -51,10 +47,7 @@ func HandleUser(w http.ResponseWriter, r *http.Request) {
 
 	savedUser, err := usersRepository.Save(userToSave)
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Bad request\n"))
-
-		return
+		return middlewares.NewBadRequestError()
 	}
 
 	response := RegisterUserResponse{
@@ -63,11 +56,13 @@ func HandleUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(response)
+
+	return nil
 }
 
-func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
+func HandleUserLogin(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
 	if r.Method != "POST" {
-		fmt.Fprintf(w, "404 Method not found\n")
+		return middlewares.NewNotImplementedError()
 	}
 
 	w.Header().Set("Content-Type", "application/json")
@@ -76,10 +71,7 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	decodeErr := json.NewDecoder(r.Body).Decode(&loginUserDto)
 
 	if decodeErr != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Invalid username/password\n"))
-
-		return
+		return middlewares.NewBadRequestError()
 	}
 
 	_, err := usersRepository.FindUserByCreds(&UserCreds{
@@ -88,10 +80,7 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	})
 
 	if err != nil {
-		w.WriteHeader(http.StatusBadRequest)
-		w.Write([]byte("Invalid username/password\n"))
-
-		return
+		return middlewares.NewBadRequestError()
 	}
 
 	response := LoginUserResponse{
@@ -99,4 +88,6 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(response)
+
+	return nil
 }
