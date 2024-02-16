@@ -7,19 +7,19 @@ type userDbConfig struct {
   Password string
 }
 
-var config *userDbConfig
+var userConfig *userDbConfig
 
 func GetUserDbConfig() *userDbConfig {
-  if config == nil {
-    config = &userDbConfig{
+  if userConfig == nil {
+    userConfig = &userDbConfig{
       User: os.Getenv("POSTGRES_USER"),
       Password: os.Getenv("POSTGRES_PASSWORD"),
     }
 
-    if config.User == "" || config.Password == "" {
+    if userConfig.User == "" || userConfig.Password == "" {
       panic("POSTGRES_USER or POSTGRES_PASSWORD not defined")
     }
   }
 
-  return config
+  return userConfig
 }

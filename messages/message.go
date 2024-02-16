@@ -1,43 +1,48 @@
 package messages
 
 import (
+	"context"
 	"errors"
 	"fmt"
-	"sync"
+
+	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type MessageDb map[string][]Message
-
-var mutex *sync.Mutex = &sync.Mutex{}
-
 type Message struct {
-	Id   string
-	Text string
+	Id string `bson:"_id"`
+
+	Text   string `bson:"text"`
+	UserId string `bson:"user_id"`
 }
 
 type MessageRepository struct {
-	db MessageDb
+	db *mongo.Collection
 }
 
 func NewMessagRepository() *MessageRepository {
-	var messageDb MessageDb = make(map[string][]Message)
-
 	return &MessageRepository{
-		db: messageDb,
+		db: GetMessagesCollection(),
 	}
 }
 
-func (repo *MessageRepository) findAll(userId string) ([]Message, error) {
-	mutex.Lock()
-	defer mutex.Unlock()
+func (repo *MessageRepository) FindAll(userId string) ([]Message, error) {
+	filter := bson.D{{"user_id", userId}}
 
-	messages, ok := repo.db[userId]
-
-	if !ok {
-		return nil, fmt.Errorf("user %s does not have messages", userId)
+	cursor, err := repo.db.Find(context.TODO(), filter)
+	if err != nil {
+		return nil, err
 	}
 
-	return messages, nil
+	var results []Message
+	if err = cursor.All(context.TODO(), &results); err != nil {
+		return nil, err
+	}
+
+  if len(results) == 0 {
+    return nil, fmt.Errorf("user %s does not have messages", userId)
+  }
+	return results, nil
 }
 
 func (repo *MessageRepository) Save(userId string, message Message) error {
@@ -45,10 +50,13 @@ func (repo *MessageRepository) Save(userId string, message Message) error {
 		return errors.New("message db is not initialized")
 	}
 
-	mutex.Lock()
-	defer mutex.Unlock()
+	message.UserId = userId
+	b, err := bson.Marshal(&message)
+	if err != nil {
+		return err
+	}
 
-	repo.db[userId] = append(repo.db[userId], message)
+	_, err = repo.db.InsertOne(context.TODO(), b)
 
-	return nil
+	return err
 }
