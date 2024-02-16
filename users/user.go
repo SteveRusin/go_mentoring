@@ -2,80 +2,71 @@ package users
 
 import (
 	"errors"
-	"sync"
+
+	"gorm.io/gorm"
 )
 
-type UserDb map[string]User
-var mutex *sync.Mutex = &sync.Mutex{}
+type UserRepository struct {
+	db *gorm.DB
+}
 
-type User struct {
-	Id       string
+type UserCreds struct {
 	Name     string
 	Password string
 }
 
-type UserRepository struct {
-	db UserDb
-}
-
-type UserCreds struct {
-  Name string
-  Password string
-}
-
 func NewUserRepository() *UserRepository {
-	var usersDb UserDb = make(map[string]User)
-
 	return &UserRepository{
-		db: usersDb,
+		db: UserDBConnect(),
 	}
 }
 
 func (repo *UserRepository) Save(user User) (*User, error) {
-  if repo.db == nil {
-    return nil, errors.New("database not initialized")
-  }
+	if repo.db == nil {
+		return nil, errors.New("database not initialized")
+	}
 
-  if user.Name == "" {
-    return nil, errors.New("User name cannot be empty")
-  }
+	if user.Name == "" {
+		return nil, errors.New("User name cannot be empty")
+	}
 
-  savedUser, _ := repo.FindByUsername(user.Name)
+	savedUser, _ := repo.FindByUsername(user.Name)
 
-  if savedUser != nil {
-    return savedUser, nil
-  }
+	if savedUser != nil {
+		return savedUser, nil
+	}
 
-  mutex.Lock()
-  defer mutex.Unlock()
-	repo.db[user.Id] = user
+	result := repo.db.Create(&user)
+
+	if result.Error != nil {
+		return nil, errors.New("error while saving user to db")
+	}
 
 	return &user, nil
 }
 
 func (repo *UserRepository) FindByUsername(name string) (*User, error) {
 	if name == "" {
-		return nil, errors.New("User name cannot be empty")
+		return nil, errors.New("user name cannot be empty")
 	}
 
-  mutex.Lock()
-  defer mutex.Unlock()
+	user := &User{}
 
-	for _, v := range repo.db {
-		if v.Name == name {
-			return &v, nil
-		}
+	result := repo.db.Where("name = ?", name).First(user)
+
+	if result.Error != nil {
+		return nil, errors.New("user not found")
 	}
 
-	return nil, errors.New("User not found")
+	return user, nil
 }
 
 func (repo *UserRepository) FindUserByCreds(creds *UserCreds) (*User, error) {
-  user, err := repo.FindByUsername(creds.Name)
+	user, err := repo.FindByUsername(creds.Name)
 
-  if err != nil || user.Password != creds.Password {
-    return nil, errors.New("Wrong username or password")
-  }
+	if err != nil || user.Password != creds.Password {
+		return nil, errors.New("wrong username or password")
+	}
 
-  return user, nil
+	return user, nil
 }
