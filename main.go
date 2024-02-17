@@ -5,7 +5,6 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/SteveRusin/go_mentoring/messages"
 	"github.com/SteveRusin/go_mentoring/users"
 	_ "github.com/joho/godotenv/autoload" // read .env file
 
@@ -13,12 +12,7 @@ import (
 )
 
 func main() {
-  users.MigrateUsersDb()
-  // messages.NewMessagRepository().Save("123", messages.Message{
-  //   Id: "msgId",
-  //   Text: "example",
-  // })
-  messages.NewMessagRepository().FindAll("1232")
+	users.MigrateUsersDb()
 	mux := http.NewServeMux()
 
 	mux.Handle(
