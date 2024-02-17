@@ -1,6 +1,5 @@
 version: '3'
 services:
-  # todo add depends 
   api:
     build: .
     ports:
@@ -10,6 +9,9 @@ services:
       - POSTGRES_PASSWORD=123
       - MONGO_USER=root
       - MONGO_PASSWORD=123
+    depends_on:
+      - users-db
+      - messages-db
   users-db:
     image: postgres:14
     ports:
@@ -17,6 +19,8 @@ services:
     environment:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=123
+    logging:
+      driver: none
     volumes:
       - postgres-data:/var/lib/postgresql/data
   messages-db:
@@ -28,6 +32,8 @@ services:
     environment:
       - MONGO_INITDB_ROOT_USERNAME=root
       - MONGO_INITDB_ROOT_PASSWORD=123
+    logging:
+      driver: none
 
 volumes:
   postgres-data:
