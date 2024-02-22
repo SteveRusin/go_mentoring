@@ -1,8 +1,12 @@
 package users
 
-import "errors"
+import (
+	"errors"
+	"sync"
+)
 
 type UserDb map[string]User
+var mutex *sync.Mutex = &sync.Mutex{}
 
 type User struct {
 	Id       string
@@ -14,6 +18,11 @@ type UserRepository struct {
 	db UserDb
 }
 
+type UserCreds struct {
+  Name string
+  Password string
+}
+
 func NewUserRepository() *UserRepository {
 	var usersDb UserDb = make(map[string]User)
 
@@ -22,20 +31,35 @@ func NewUserRepository() *UserRepository {
 	}
 }
 
-func (repo *UserRepository) Save(user User) (*UserRepository, error) {
+func (repo *UserRepository) Save(user User) (*User, error) {
   if repo.db == nil {
     return nil, errors.New("database not initialized")
   }
 
+  if user.Name == "" {
+    return nil, errors.New("User name cannot be empty")
+  }
+
+  savedUser, _ := repo.FindByUsername(user.Name)
+
+  if savedUser != nil {
+    return savedUser, nil
+  }
+
+  mutex.Lock()
+  defer mutex.Unlock()
 	repo.db[user.Id] = user
 
-	return repo, nil
+	return &user, nil
 }
 
 func (repo *UserRepository) FindByUsername(name string) (*User, error) {
 	if name == "" {
 		return nil, errors.New("User name cannot be empty")
 	}
+
+  mutex.Lock()
+  defer mutex.Unlock()
 
 	for _, v := range repo.db {
 		if v.Name == name {
@@ -44,4 +68,14 @@ func (repo *UserRepository) FindByUsername(name string) (*User, error) {
 	}
 
 	return nil, errors.New("User not found")
+}
+
+func (repo *UserRepository) FindUserByCreds(creds *UserCreds) (*User, error) {
+  user, err := repo.FindByUsername(creds.Name)
+
+  if err != nil || user.Password != creds.Password {
+    return nil, errors.New("Wrong username or password")
+  }
+
+  return user, nil
 }

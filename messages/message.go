@@ -3,9 +3,12 @@ package messages
 import (
 	"errors"
 	"fmt"
+	"sync"
 )
 
 type MessageDb map[string][]Message
+
+var mutex *sync.Mutex = &sync.Mutex{}
 
 type Message struct {
 	Id   string
@@ -25,6 +28,9 @@ func NewMessagRepository() *MessageRepository {
 }
 
 func (repo *MessageRepository) findAll(userId string) ([]Message, error) {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	messages, ok := repo.db[userId]
 
 	if !ok {
@@ -34,12 +40,15 @@ func (repo *MessageRepository) findAll(userId string) ([]Message, error) {
 	return messages, nil
 }
 
-func (repo *MessageRepository) Save(userId string, message Message) (error) {
-  if repo.db == nil {
-    return errors.New("message db is not initialized")
-  }
+func (repo *MessageRepository) Save(userId string, message Message) error {
+	if repo.db == nil {
+		return errors.New("message db is not initialized")
+	}
 
-  repo.db[userId] = append(repo.db[userId], message)
+	mutex.Lock()
+	defer mutex.Unlock()
 
-  return nil
+	repo.db[userId] = append(repo.db[userId], message)
+
+	return nil
 }
