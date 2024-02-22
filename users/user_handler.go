@@ -24,9 +24,17 @@ type LoginUserResponse struct {
 	Url string `json:"url"`
 }
 
-var usersRepository = NewUserRepository()
+type userHandlers struct {
+  repository UserRepository
+}
 
-func HandleUser(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+func NewUserHandlers() *userHandlers {
+  return &userHandlers{
+    repository: NewUserPgRepository(),
+  }
+}
+
+func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
 	if r.Method != "POST" {
 		return middlewares.NewNotImplementedError()
 	}
@@ -45,7 +53,7 @@ func HandleUser(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
 		Password: registerUserDto.Password,
 	}
 
-	savedUser, err := usersRepository.Save(userToSave)
+	savedUser, err := handler.repository.Save(userToSave)
 	if err != nil {
 		return middlewares.NewBadRequestError()
 	}
@@ -60,7 +68,7 @@ func HandleUser(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
 	return nil
 }
 
-func HandleUserLogin(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+func (handler *userHandlers) UserLogin(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
 	if r.Method != "POST" {
 		return middlewares.NewNotImplementedError()
 	}
@@ -74,7 +82,7 @@ func HandleUserLogin(w http.ResponseWriter, r *http.Request) *middlewares.HttpEr
 		return middlewares.NewBadRequestError()
 	}
 
-	_, err := usersRepository.FindUserByCreds(&UserCreds{
+	_, err := handler.repository.FindUserByCreds(&UserCreds{
 		Name:     loginUserDto.UserName,
 		Password: loginUserDto.Password,
 	})

@@ -6,7 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
-type UserRepository struct {
+type UserRepository interface {
+	Save(user User) (*User, error)
+	FindByUsername(name string) (*User, error)
+	FindUserByCreds(creds *UserCreds) (*User, error)
+}
+
+type UserPgRepository struct {
 	db *gorm.DB
 }
 
@@ -15,13 +21,13 @@ type UserCreds struct {
 	Password string
 }
 
-func NewUserRepository() *UserRepository {
-	return &UserRepository{
+func NewUserPgRepository() *UserPgRepository {
+	return &UserPgRepository{
 		db: UserDBConnect(),
 	}
 }
 
-func (repo *UserRepository) Save(user User) (*User, error) {
+func (repo *UserPgRepository) Save(user User) (*User, error) {
 	if repo.db == nil {
 		return nil, errors.New("database not initialized")
 	}
@@ -45,7 +51,7 @@ func (repo *UserRepository) Save(user User) (*User, error) {
 	return &user, nil
 }
 
-func (repo *UserRepository) FindByUsername(name string) (*User, error) {
+func (repo *UserPgRepository) FindByUsername(name string) (*User, error) {
 	if name == "" {
 		return nil, errors.New("user name cannot be empty")
 	}
@@ -61,7 +67,7 @@ func (repo *UserRepository) FindByUsername(name string) (*User, error) {
 	return user, nil
 }
 
-func (repo *UserRepository) FindUserByCreds(creds *UserCreds) (*User, error) {
+func (repo *UserPgRepository) FindUserByCreds(creds *UserCreds) (*User, error) {
 	user, err := repo.FindByUsername(creds.Name)
 
 	if err != nil || user.Password != creds.Password {

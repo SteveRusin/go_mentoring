@@ -15,12 +15,14 @@ func main() {
 	users.MigrateUsersDb()
 	mux := http.NewServeMux()
 
+	usersHandler := users.NewUserHandlers()
+
 	mux.Handle(
 		"/user",
 		middlewares.CatchPanicMiddleware(
 			middlewares.LogHttpMiddleware(
 				middlewares.ErrorMiddleware(
-					users.HandleUser,
+					usersHandler.User,
 				),
 			),
 		),
@@ -31,7 +33,7 @@ func main() {
 		middlewares.CatchPanicMiddleware(
 			middlewares.LogHttpMiddleware(
 				middlewares.ErrorMiddleware(
-					users.HandleUserLogin,
+					usersHandler.UserLogin,
 				),
 			),
 		),
