@@ -16,6 +16,7 @@ type Message struct {
 	UserId string `bson:"user_id"`
 }
 
+// todo use interface
 type MessageRepository struct {
 	db *mongo.Collection
 }

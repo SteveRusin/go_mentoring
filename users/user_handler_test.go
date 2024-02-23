@@ -23,10 +23,9 @@ type userHandlersSuite struct {
 	handlers       userHandlers
 }
 
-// todo move mocks to separate folder
 func (m *userRepositoryMock) Save(user User) (*User, error) {
-  m.Called()
-	return &user, nil
+	args := m.Called(user)
+	return args.Get(0).(*User), args.Error(1)
 }
 
 func (m *userRepositoryMock) FindByUsername(name string) (*User, error) {
@@ -54,13 +53,18 @@ func (suite *userHandlersSuite) TestShouldSaveUser() {
       "password": "qwerty"
     }
   `
+	expected := &User{
+		Id:       "123",
+		Name:     "Steve",
+		Password: "qwerty",
+	}
 	req, err := http.NewRequest(http.MethodPost, url, strings.NewReader(payload))
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	rr := httptest.NewRecorder()
-  suite.repositoryMock.On("Save").Return(mock.Anything)
+	suite.repositoryMock.On("Save", mock.IsType(User{})).Return(expected, nil)
 
 	suite.handlers.User(rr, req)
 	var response RegisterUserResponse
@@ -70,8 +74,7 @@ func (suite *userHandlersSuite) TestShouldSaveUser() {
 		t.Fatal(err)
 	}
 
-  suite.repositoryMock.AssertCalled(t, "Save")
-	if response.UserName != "Steve" || response.Id == "" {
+	if response.UserName != expected.Name || response.Id != expected.Id {
 		t.Fatal("Wrong response")
 	}
 }
