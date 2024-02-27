@@ -2,7 +2,6 @@ package users
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/SteveRusin/go_mentoring/middlewares"
