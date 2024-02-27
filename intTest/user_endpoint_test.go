@@ -54,7 +54,7 @@ func TestUserEndpoint(t *testing.T) {
         }
       `),
 			expectedStatusCode: http.StatusOK,
-      expectedBody: "\"userName\":\"Test\"",
+			expectedBody:       "\"userName\":\"Test\"",
 		},
 	}
 
