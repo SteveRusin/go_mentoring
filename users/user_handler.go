@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/SteveRusin/go_mentoring/middlewares"
@@ -25,13 +26,13 @@ type LoginUserResponse struct {
 }
 
 type userHandlers struct {
-  repository UserRepository
+	repository UserRepository
 }
 
 func NewUserHandlers() *userHandlers {
-  return &userHandlers{
-    repository: NewUserPgRepository(),
-  }
+	return &userHandlers{
+		repository: NewUserPgRepository(),
+	}
 }
 
 func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
@@ -86,7 +87,6 @@ func (handler *userHandlers) UserLogin(w http.ResponseWriter, r *http.Request) *
 		Name:     loginUserDto.UserName,
 		Password: loginUserDto.Password,
 	})
-
 	if err != nil {
 		return middlewares.NewBadRequestError()
 	}

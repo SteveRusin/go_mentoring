@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/SteveRusin/go_mentoring/config"
 	"github.com/SteveRusin/go_mentoring/users"
 	_ "github.com/joho/godotenv/autoload" // read .env file
 
@@ -39,8 +40,9 @@ func main() {
 		),
 	)
 
-	slog.Info("Server is listening on localhost:8080")
-	err := http.ListenAndServe("localhost:8080", mux)
+  host := fmt.Sprintf("%s:8080", config.GetAppConfig().Host)
+	slog.Info(fmt.Sprintf("Server is listening on %s", host))
+	err := http.ListenAndServe(host, mux)
 
 	slog.Error(fmt.Sprint(err))
 }
