@@ -6,9 +6,13 @@ import (
 	"gorm.io/gorm"
 )
 
+// this file sould be moved to and replaced with gRPC call to user-managment service
 type UserRepository interface {
+  // StoreUser operation
 	Save(user User) (*User, error)
+  // GetUser operation
 	FindByUsername(name string) (*User, error)
+  // GetUser operation
 	FindUserByCreds(creds *UserCreds) (*User, error)
 }
 

@@ -30,6 +30,7 @@ type userHandlers struct {
 
 func NewUserHandlers() *userHandlers {
 	return &userHandlers{
+    // replace with api client
 		repository: NewUserPgRepository(),
 	}
 }
@@ -48,6 +49,7 @@ func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middl
 	}
 
 	userToSave := User{
+    // move id generation to gRPC service
 		Id:       randomId.New(),
 		Name:     registerUserDto.UserName,
 		Password: registerUserDto.Password,

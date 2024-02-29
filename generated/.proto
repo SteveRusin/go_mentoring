@@ -1,0 +1,18 @@
+syntax = "proto3";
+package users;
+
+option go_package = "github.com/SteveRusin/go_mentoring/generated";
+
+message StoreUserRequest {
+  string userName = 1;
+  string password = 2;
+}
+
+message StoreUserReply {
+  string id = 1;
+  string userName = 2;
+}
+
+service UserMangment {
+  rpc StoreUser (StoreUserRequest) returns (StoreUserReply) {}
+}
