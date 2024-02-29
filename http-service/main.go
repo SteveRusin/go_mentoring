@@ -5,11 +5,11 @@ import (
 	"log/slog"
 	"net/http"
 
-	"github.com/SteveRusin/go_mentoring/config"
-	"github.com/SteveRusin/go_mentoring/users"
+	"github.com/SteveRusin/go_mentoring/http-service/config"
+	"github.com/SteveRusin/go_mentoring/http-service/users"
 	_ "github.com/joho/godotenv/autoload" // read .env file
 
-	"github.com/SteveRusin/go_mentoring/middlewares"
+	"github.com/SteveRusin/go_mentoring/http-service/middlewares"
 )
 
 func main() {

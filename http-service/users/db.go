@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"github.com/SteveRusin/go_mentoring/config"
+	"github.com/SteveRusin/go_mentoring/http-service/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )

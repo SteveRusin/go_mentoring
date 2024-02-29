@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/SteveRusin/go_mentoring/middlewares"
-	"github.com/SteveRusin/go_mentoring/randomId"
+	"github.com/SteveRusin/go_mentoring/http-service/middlewares"
+	"github.com/SteveRusin/go_mentoring/http-service/randomId"
 )
 
 type RegisterUserDto struct {

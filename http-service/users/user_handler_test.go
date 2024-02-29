@@ -8,7 +8,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SteveRusin/go_mentoring/middlewares"
+	"github.com/SteveRusin/go_mentoring/http-service/middlewares"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/suite"
 )

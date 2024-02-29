@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/SteveRusin/go_mentoring/config"
+	"github.com/SteveRusin/go_mentoring/http-service/config"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
