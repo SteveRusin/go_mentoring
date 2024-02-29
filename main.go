@@ -6,11 +6,13 @@ import (
 	"net/http"
 
 	"github.com/SteveRusin/go_mentoring/users"
+	_ "github.com/joho/godotenv/autoload" // read .env file
 
 	"github.com/SteveRusin/go_mentoring/middlewares"
 )
 
 func main() {
+	users.MigrateUsersDb()
 	mux := http.NewServeMux()
 
 	mux.Handle(
