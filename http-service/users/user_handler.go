@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
+	users_rpc "github.com/SteveRusin/go_mentoring/generated"
 	"github.com/SteveRusin/go_mentoring/http-service/middlewares"
-	"github.com/SteveRusin/go_mentoring/http-service/randomId"
 )
 
 type RegisterUserDto struct {
@@ -25,12 +25,12 @@ type LoginUserResponse struct {
 }
 
 type userHandlers struct {
-  userClient UserClient
+	userClient UserClient
 }
 
 func NewUserHandlers() *userHandlers {
 	return &userHandlers{
-    userClient: NewUserHTTPClient(),
+		userClient: NewUserHTTPClient(),
 	}
 }
 
@@ -47,9 +47,7 @@ func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middl
 		return middlewares.NewBadRequestError()
 	}
 
-	userToSave := User{
-    // move id generation to gRPC service
-		Id:       randomId.New(),
+	userToSave := &users_rpc.StoreUserRequest{
 		Name:     registerUserDto.UserName,
 		Password: registerUserDto.Password,
 	}
@@ -70,7 +68,7 @@ func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middl
 }
 
 func (handler *userHandlers) UserLogin(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-  return middlewares.NewNotImplementedError()
+	return middlewares.NewNotImplementedError()
 	// if r.Method != "POST" {
 	// 	return middlewares.NewNotImplementedError()
 	// }

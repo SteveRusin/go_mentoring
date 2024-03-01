@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"fmt"
 
 	users_rpc "github.com/SteveRusin/go_mentoring/generated"
@@ -9,12 +10,11 @@ import (
 )
 
 type (
-	User       = users_rpc.StoreUserRequest
 	UserCreds  = any
 	UserClient interface {
-		Save(user User) (*User, error)
-		FindByUsername(name string) (*User, error)
-		FindUserByCreds(creds *UserCreds) (*User, error)
+		Save(user *users_rpc.StoreUserRequest) (*users_rpc.StoreUserReply, error)
+		FindByUsername(name string) (*users_rpc.StoreUserReply, error)
+		FindUserByCreds(creds *UserCreds) (*users_rpc.StoreUserReply, error)
 	}
 )
 
@@ -25,7 +25,7 @@ type UserRpcClient struct {
 func NewUserHTTPClient() *UserRpcClient {
 	config := config.GetUserServerConfig()
 
-	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", config.Host, config.Port))
+	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", config.Host, config.Port), grpc.WithInsecure())
 	if err != nil {
 		panic(err)
 	}
@@ -35,15 +35,15 @@ func NewUserHTTPClient() *UserRpcClient {
 	}
 }
 
-func (uc *UserRpcClient) Save(user User) (*User, error) {
-	res, err := uc.Save(user)
+func (uc *UserRpcClient) Save(user *users_rpc.StoreUserRequest) (*users_rpc.StoreUserReply, error) {
+	res, err := uc.client.StoreUser(context.TODO(), user)
 	return res, err
 }
 
-func (uc *UserRpcClient) FindByUsername(name string) (*User, error) {
+func (uc *UserRpcClient) FindByUsername(name string) (*users_rpc.StoreUserReply, error) {
 	return nil, nil
 }
 
-func (uc *UserRpcClient) FindUserByCreds(creds *UserCreds) (*User, error) {
+func (uc *UserRpcClient) FindUserByCreds(creds *UserCreds) (*users_rpc.StoreUserReply, error) {
 	return nil, nil
 }
