@@ -13,7 +13,6 @@ import (
 )
 
 func main() {
-	users.MigrateUsersDb()
 	mux := http.NewServeMux()
 
 	usersHandler := users.NewUserHandlers()

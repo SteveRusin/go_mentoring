@@ -1,7 +1,7 @@
 syntax = "proto3";
-package users;
+package users_rpc;
 
-option go_package = "github.com/SteveRusin/go_mentoring/generated";
+option go_package = "github.com/SteveRusin/go_mentoring/generated/users_rpc";
 
 message StoreUserRequest {
   string userName = 1;

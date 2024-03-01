@@ -25,13 +25,12 @@ type LoginUserResponse struct {
 }
 
 type userHandlers struct {
-	repository UserRepository
+  userClient UserClient
 }
 
 func NewUserHandlers() *userHandlers {
 	return &userHandlers{
-    // replace with api client
-		repository: NewUserPgRepository(),
+    userClient: NewUserHTTPClient(),
 	}
 }
 
@@ -55,7 +54,7 @@ func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middl
 		Password: registerUserDto.Password,
 	}
 
-	savedUser, err := handler.repository.Save(userToSave)
+	savedUser, err := handler.userClient.Save(userToSave)
 	if err != nil {
 		return middlewares.NewBadRequestError()
 	}
@@ -71,32 +70,33 @@ func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middl
 }
 
 func (handler *userHandlers) UserLogin(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-	if r.Method != "POST" {
-		return middlewares.NewNotImplementedError()
-	}
-
-	w.Header().Set("Content-Type", "application/json")
-	loginUserDto := LoginUserDto{}
-
-	decodeErr := json.NewDecoder(r.Body).Decode(&loginUserDto)
-
-	if decodeErr != nil {
-		return middlewares.NewBadRequestError()
-	}
-
-	_, err := handler.repository.FindUserByCreds(&UserCreds{
-		Name:     loginUserDto.UserName,
-		Password: loginUserDto.Password,
-	})
-	if err != nil {
-		return middlewares.NewBadRequestError()
-	}
-
-	response := LoginUserResponse{
-		Url: "ws://mock.url.io/token=.....",
-	}
-
-	json.NewEncoder(w).Encode(response)
-
-	return nil
+  return middlewares.NewNotImplementedError()
+	// if r.Method != "POST" {
+	// 	return middlewares.NewNotImplementedError()
+	// }
+	//
+	// w.Header().Set("Content-Type", "application/json")
+	// loginUserDto := LoginUserDto{}
+	//
+	// decodeErr := json.NewDecoder(r.Body).Decode(&loginUserDto)
+	//
+	// if decodeErr != nil {
+	// 	return middlewares.NewBadRequestError()
+	// }
+	//
+	// _, err := handler.userClient.FindUserByCreds(&UserCreds{
+	// 	Name:     loginUserDto.UserName,
+	// 	Password: loginUserDto.Password,
+	// })
+	// if err != nil {
+	// 	return middlewares.NewBadRequestError()
+	// }
+	//
+	// response := LoginUserResponse{
+	// 	Url: "ws://mock.url.io/token=.....",
+	// }
+	//
+	// json.NewEncoder(w).Encode(response)
+	//
+	// return nil
 }

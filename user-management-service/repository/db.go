@@ -1,10 +1,10 @@
-package users
+package repository
 
 import (
 	"fmt"
 	"log/slog"
 
-	"github.com/SteveRusin/go_mentoring/http-service/config"
+	"github.com/SteveRusin/go_mentoring/user-management-service/config"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 )
