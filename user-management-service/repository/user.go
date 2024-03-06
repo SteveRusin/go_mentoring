@@ -6,13 +6,9 @@ import (
 	"gorm.io/gorm"
 )
 
-// this file sould be moved to and replaced with gRPC call to user-managment service
 type UserRepository interface {
-  // StoreUser operation
-	Save(user User) (*User, error)
-  // GetUser operation
+	Save(user *User) (*User, error)
 	FindByUsername(name string) (*User, error)
-  // GetUser operation
 	FindUserByCreds(creds *UserCreds) (*User, error)
 }
 
@@ -31,7 +27,7 @@ func NewUserPgRepository() *UserPgRepository {
 	}
 }
 
-func (repo *UserPgRepository) Save(user User) (*User, error) {
+func (repo *UserPgRepository) Save(user *User) (*User, error) {
 	if repo.db == nil {
 		return nil, errors.New("database not initialized")
 	}
@@ -52,7 +48,7 @@ func (repo *UserPgRepository) Save(user User) (*User, error) {
 		return nil, errors.New("error while saving user to db")
 	}
 
-	return &user, nil
+	return user, nil
 }
 
 func (repo *UserPgRepository) FindByUsername(name string) (*User, error) {

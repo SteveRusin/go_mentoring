@@ -30,7 +30,7 @@ type userHandlers struct {
 
 func NewUserHandlers() *userHandlers {
 	return &userHandlers{
-		userClient: NewUserHTTPClient(),
+		userClient: NewUserRpcClient(),
 	}
 }
 
@@ -68,33 +68,32 @@ func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middl
 }
 
 func (handler *userHandlers) UserLogin(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-	return middlewares.NewNotImplementedError()
-	// if r.Method != "POST" {
-	// 	return middlewares.NewNotImplementedError()
-	// }
-	//
-	// w.Header().Set("Content-Type", "application/json")
-	// loginUserDto := LoginUserDto{}
-	//
-	// decodeErr := json.NewDecoder(r.Body).Decode(&loginUserDto)
-	//
-	// if decodeErr != nil {
-	// 	return middlewares.NewBadRequestError()
-	// }
-	//
-	// _, err := handler.userClient.FindUserByCreds(&UserCreds{
-	// 	Name:     loginUserDto.UserName,
-	// 	Password: loginUserDto.Password,
-	// })
-	// if err != nil {
-	// 	return middlewares.NewBadRequestError()
-	// }
-	//
-	// response := LoginUserResponse{
-	// 	Url: "ws://mock.url.io/token=.....",
-	// }
-	//
-	// json.NewEncoder(w).Encode(response)
-	//
-	// return nil
+	if r.Method != "POST" {
+		return middlewares.NewNotImplementedError()
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	loginUserDto := LoginUserDto{}
+
+	decodeErr := json.NewDecoder(r.Body).Decode(&loginUserDto)
+
+	if decodeErr != nil {
+		return middlewares.NewBadRequestError()
+	}
+
+	res, err := handler.userClient.FindUserByCreds(&users_rpc.GetUserRequest{
+		Name:     loginUserDto.UserName,
+		Password: loginUserDto.Password,
+	})
+	if res.GetId() == "" || err != nil {
+		return middlewares.NewBadRequestError()
+	}
+
+	response := LoginUserResponse{
+		Url: "ws://mock.url.io/token=.....",
+	}
+
+	json.NewEncoder(w).Encode(response)
+
+	return nil
 }

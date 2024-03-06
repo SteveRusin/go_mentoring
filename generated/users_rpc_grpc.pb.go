@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	UserMangment_StoreUser_FullMethodName = "/users_rpc.UserMangment/StoreUser"
+	UserMangment_GetUser_FullMethodName   = "/users_rpc.UserMangment/GetUser"
 )
 
 // UserMangmentClient is the client API for UserMangment service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UserMangmentClient interface {
 	StoreUser(ctx context.Context, in *StoreUserRequest, opts ...grpc.CallOption) (*StoreUserReply, error)
+	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
 }
 
 type userMangmentClient struct {
@@ -46,11 +48,21 @@ func (c *userMangmentClient) StoreUser(ctx context.Context, in *StoreUserRequest
 	return out, nil
 }
 
+func (c *userMangmentClient) GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error) {
+	out := new(GetUserReply)
+	err := c.cc.Invoke(ctx, UserMangment_GetUser_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // UserMangmentServer is the server API for UserMangment service.
 // All implementations must embed UnimplementedUserMangmentServer
 // for forward compatibility
 type UserMangmentServer interface {
 	StoreUser(context.Context, *StoreUserRequest) (*StoreUserReply, error)
+	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	mustEmbedUnimplementedUserMangmentServer()
 }
 
@@ -60,6 +72,9 @@ type UnimplementedUserMangmentServer struct {
 
 func (UnimplementedUserMangmentServer) StoreUser(context.Context, *StoreUserRequest) (*StoreUserReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method StoreUser not implemented")
+}
+func (UnimplementedUserMangmentServer) GetUser(context.Context, *GetUserRequest) (*GetUserReply, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
 }
 func (UnimplementedUserMangmentServer) mustEmbedUnimplementedUserMangmentServer() {}
 
@@ -92,6 +107,24 @@ func _UserMangment_StoreUser_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserMangment_GetUser_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetUserRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(UserMangmentServer).GetUser(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: UserMangment_GetUser_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(UserMangmentServer).GetUser(ctx, req.(*GetUserRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // UserMangment_ServiceDesc is the grpc.ServiceDesc for UserMangment service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +135,10 @@ var UserMangment_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StoreUser",
 			Handler:    _UserMangment_StoreUser_Handler,
+		},
+		{
+			MethodName: "GetUser",
+			Handler:    _UserMangment_GetUser_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

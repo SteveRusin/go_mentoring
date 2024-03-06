@@ -5,14 +5,25 @@ option go_package = "github.com/SteveRusin/go_mentoring/generated/users_rpc";
 
 message StoreUserRequest {
   string Name = 1;
-  string password = 2;
+  string Password = 2;
 }
 
 message StoreUserReply {
-  string id = 1;
+  string Id = 1;
+  string Name = 2;
+}
+
+message GetUserRequest {
+  string Name = 1;
+  string Password = 2;
+}
+
+message GetUserReply {
+  string Id = 1;
   string Name = 2;
 }
 
 service UserMangment {
   rpc StoreUser (StoreUserRequest) returns (StoreUserReply) {}
+  rpc GetUser (GetUserRequest) returns (GetUserReply) {}
 }

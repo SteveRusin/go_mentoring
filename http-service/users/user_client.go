@@ -10,11 +10,9 @@ import (
 )
 
 type (
-	UserCreds  = any
 	UserClient interface {
 		Save(user *users_rpc.StoreUserRequest) (*users_rpc.StoreUserReply, error)
-		FindByUsername(name string) (*users_rpc.StoreUserReply, error)
-		FindUserByCreds(creds *UserCreds) (*users_rpc.StoreUserReply, error)
+		FindUserByCreds(creds *users_rpc.GetUserRequest) (*users_rpc.GetUserReply, error)
 	}
 )
 
@@ -22,7 +20,7 @@ type UserRpcClient struct {
 	client users_rpc.UserMangmentClient
 }
 
-func NewUserHTTPClient() *UserRpcClient {
+func NewUserRpcClient() *UserRpcClient {
 	config := config.GetUserServerConfig()
 
 	conn, err := grpc.Dial(fmt.Sprintf("%s:%s", config.Host, config.Port), grpc.WithInsecure())
@@ -40,10 +38,7 @@ func (uc *UserRpcClient) Save(user *users_rpc.StoreUserRequest) (*users_rpc.Stor
 	return res, err
 }
 
-func (uc *UserRpcClient) FindByUsername(name string) (*users_rpc.StoreUserReply, error) {
-	return nil, nil
-}
-
-func (uc *UserRpcClient) FindUserByCreds(creds *UserCreds) (*users_rpc.StoreUserReply, error) {
-	return nil, nil
+func (uc *UserRpcClient) FindUserByCreds(creds *users_rpc.GetUserRequest) (*users_rpc.GetUserReply, error) {
+  res, err := uc.client.GetUser(context.TODO(), creds)
+  return res, err
 }
