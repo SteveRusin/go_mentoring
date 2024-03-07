@@ -13,6 +13,7 @@ type (
 	UserClient interface {
 		Save(user *users_rpc.StoreUserRequest) (*users_rpc.StoreUserReply, error)
 		FindUserByCreds(creds *users_rpc.GetUserRequest) (*users_rpc.GetUserReply, error)
+		NewUploadImageClient(ctx context.Context, opts ...grpc.CallOption) (users_rpc.UserMangment_UploadImageClient, error)
 	}
 )
 
@@ -39,6 +40,10 @@ func (uc *UserRpcClient) Save(user *users_rpc.StoreUserRequest) (*users_rpc.Stor
 }
 
 func (uc *UserRpcClient) FindUserByCreds(creds *users_rpc.GetUserRequest) (*users_rpc.GetUserReply, error) {
-  res, err := uc.client.GetUser(context.TODO(), creds)
-  return res, err
+	res, err := uc.client.GetUser(context.TODO(), creds)
+	return res, err
+}
+
+func (uc *UserRpcClient) NewUploadImageClient(ctx context.Context, opts ...grpc.CallOption) (users_rpc.UserMangment_UploadImageClient, error) {
+	return uc.client.UploadImage(ctx, opts...)
 }

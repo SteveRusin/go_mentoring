@@ -19,8 +19,9 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UserMangment_StoreUser_FullMethodName = "/users_rpc.UserMangment/StoreUser"
-	UserMangment_GetUser_FullMethodName   = "/users_rpc.UserMangment/GetUser"
+	UserMangment_StoreUser_FullMethodName   = "/users_rpc.UserMangment/StoreUser"
+	UserMangment_GetUser_FullMethodName     = "/users_rpc.UserMangment/GetUser"
+	UserMangment_UploadImage_FullMethodName = "/users_rpc.UserMangment/UploadImage"
 )
 
 // UserMangmentClient is the client API for UserMangment service.
@@ -29,6 +30,7 @@ const (
 type UserMangmentClient interface {
 	StoreUser(ctx context.Context, in *StoreUserRequest, opts ...grpc.CallOption) (*StoreUserReply, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
+	UploadImage(ctx context.Context, opts ...grpc.CallOption) (UserMangment_UploadImageClient, error)
 }
 
 type userMangmentClient struct {
@@ -57,12 +59,47 @@ func (c *userMangmentClient) GetUser(ctx context.Context, in *GetUserRequest, op
 	return out, nil
 }
 
+func (c *userMangmentClient) UploadImage(ctx context.Context, opts ...grpc.CallOption) (UserMangment_UploadImageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UserMangment_ServiceDesc.Streams[0], UserMangment_UploadImage_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &userMangmentUploadImageClient{stream}
+	return x, nil
+}
+
+type UserMangment_UploadImageClient interface {
+	Send(*UploadImageRequest) error
+	CloseAndRecv() (*UploadImageResponse, error)
+	grpc.ClientStream
+}
+
+type userMangmentUploadImageClient struct {
+	grpc.ClientStream
+}
+
+func (x *userMangmentUploadImageClient) Send(m *UploadImageRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *userMangmentUploadImageClient) CloseAndRecv() (*UploadImageResponse, error) {
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	m := new(UploadImageResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // UserMangmentServer is the server API for UserMangment service.
 // All implementations must embed UnimplementedUserMangmentServer
 // for forward compatibility
 type UserMangmentServer interface {
 	StoreUser(context.Context, *StoreUserRequest) (*StoreUserReply, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
+	UploadImage(UserMangment_UploadImageServer) error
 	mustEmbedUnimplementedUserMangmentServer()
 }
 
@@ -75,6 +112,9 @@ func (UnimplementedUserMangmentServer) StoreUser(context.Context, *StoreUserRequ
 }
 func (UnimplementedUserMangmentServer) GetUser(context.Context, *GetUserRequest) (*GetUserReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUser not implemented")
+}
+func (UnimplementedUserMangmentServer) UploadImage(UserMangment_UploadImageServer) error {
+	return status.Errorf(codes.Unimplemented, "method UploadImage not implemented")
 }
 func (UnimplementedUserMangmentServer) mustEmbedUnimplementedUserMangmentServer() {}
 
@@ -125,6 +165,32 @@ func _UserMangment_GetUser_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _UserMangment_UploadImage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(UserMangmentServer).UploadImage(&userMangmentUploadImageServer{stream})
+}
+
+type UserMangment_UploadImageServer interface {
+	SendAndClose(*UploadImageResponse) error
+	Recv() (*UploadImageRequest, error)
+	grpc.ServerStream
+}
+
+type userMangmentUploadImageServer struct {
+	grpc.ServerStream
+}
+
+func (x *userMangmentUploadImageServer) SendAndClose(m *UploadImageResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *userMangmentUploadImageServer) Recv() (*UploadImageRequest, error) {
+	m := new(UploadImageRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // UserMangment_ServiceDesc is the grpc.ServiceDesc for UserMangment service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -141,6 +207,12 @@ var UserMangment_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _UserMangment_GetUser_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "UploadImage",
+			Handler:       _UserMangment_UploadImage_Handler,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "generated/users_rpc.proto",
 }

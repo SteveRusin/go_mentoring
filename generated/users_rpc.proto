@@ -23,7 +23,28 @@ message GetUserReply {
   string Name = 2;
 }
 
+message UploadImageRequest {
+  oneof data {
+    ImageInfo info = 1;
+    bytes chunk_data = 2;
+  }
+}
+
+message ImageInfo {
+  uint32 fileSize = 1;
+  string image_type = 2;
+}
+
+message UploadImageResponse {
+  oneof response {
+    string error = 1;
+    // id is used to query the image on FetchImage
+    string id = 2;
+  }
+}
+
 service UserMangment {
   rpc StoreUser (StoreUserRequest) returns (StoreUserReply) {}
   rpc GetUser (GetUserRequest) returns (GetUserReply) {}
+  rpc UploadImage (stream UploadImageRequest) returns (UploadImageResponse) {}
 }

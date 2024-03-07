@@ -6,6 +6,7 @@ import (
 	"net/http"
 
 	"github.com/SteveRusin/go_mentoring/http-service/config"
+	"github.com/SteveRusin/go_mentoring/http-service/image"
 	"github.com/SteveRusin/go_mentoring/http-service/users"
 	_ "github.com/joho/godotenv/autoload" // read .env file
 
@@ -16,6 +17,7 @@ func main() {
 	mux := http.NewServeMux()
 
 	usersHandler := users.NewUserHandlers()
+	imageHandler := image.NewImageHandlers()
 
 	mux.Handle(
 		"/user",
@@ -39,7 +41,18 @@ func main() {
 		),
 	)
 
-  host := fmt.Sprintf("%s:8080", config.GetAppConfig().Host)
+	mux.Handle(
+		"/image",
+		middlewares.CatchPanicMiddleware(
+			middlewares.LogHttpMiddleware(
+				middlewares.ErrorMiddleware(
+					imageHandler.Image,
+				),
+			),
+		),
+	)
+
+	host := fmt.Sprintf("%s:8080", config.GetAppConfig().Host)
 	slog.Info(fmt.Sprintf("Server is listening on %s", host))
 	err := http.ListenAndServe(host, mux)
 
