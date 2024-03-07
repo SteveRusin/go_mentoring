@@ -151,6 +151,11 @@ func (s *Server) UploadImage(stream users_rpc.UserMangment_UploadImageServer) er
 	})
 }
 
+func (s *Server) FetchImage(req *users_rpc.FetchImageRequest, stream users_rpc.UserMangment_FetchImageServer) error {
+  log.Println("Fetching image", req.GetId())
+  return nil
+}
+
 func cleanUpFile(filePath string) {
 	err := os.Remove(filePath)
 	if err != nil {

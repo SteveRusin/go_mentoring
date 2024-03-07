@@ -23,10 +23,7 @@ func NewImageHandlers() *imageHandlers {
 	}
 }
 
-func (handler *imageHandlers) Image(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-	if r.Method != "POST" {
-		return middlewares.NewNotImplementedError()
-	}
+func (handler *imageHandlers) postImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20) // 10 MB limit
 	defer r.Body.Close()
 
@@ -40,12 +37,16 @@ func (handler *imageHandlers) Image(w http.ResponseWriter, r *http.Request) *mid
 	}
 
 	totalSent := uint32(0)
+  fileTypeSlice := strings.Split(r.Header.Get("Content-Type"), "/")
+  if len(fileTypeSlice) != 2 || fileTypeSlice[0] != "image" {
+    return middlewares.NewBadRequestError()
+  }
 
 	imgInfo := &users_rpc.UploadImageRequest{
 		Data: &users_rpc.UploadImageRequest_Info{
 			Info: &users_rpc.ImageInfo{
 				FileSize:  uint32(imageSize),
-				ImageType: strings.Split(r.Header.Get("Content-Type"), "/")[1],
+				ImageType: fileTypeSlice[1],
 			},
 		},
 	}
@@ -108,4 +109,22 @@ func (handler *imageHandlers) Image(w http.ResponseWriter, r *http.Request) *mid
 	w.Write([]byte(res.GetId()))
 
 	return nil
+}
+
+func (hander *imageHandlers) getImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+  imgId := r.URL.Path[len("/image/"):]
+  log.Println("Fetching image", imgId)
+  return middlewares.NewNotImplementedError()
+}
+
+func (handler *imageHandlers) Image(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+	if r.Method == "POST" {
+		return handler.postImage(w, r)
+	}
+
+  if r.Method == "GET" {
+    return handler.getImage(w, r)
+  }
+
+  return middlewares.NewNotImplementedError()
 }

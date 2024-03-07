@@ -22,6 +22,7 @@ const (
 	UserMangment_StoreUser_FullMethodName   = "/users_rpc.UserMangment/StoreUser"
 	UserMangment_GetUser_FullMethodName     = "/users_rpc.UserMangment/GetUser"
 	UserMangment_UploadImage_FullMethodName = "/users_rpc.UserMangment/UploadImage"
+	UserMangment_FetchImage_FullMethodName  = "/users_rpc.UserMangment/FetchImage"
 )
 
 // UserMangmentClient is the client API for UserMangment service.
@@ -31,6 +32,7 @@ type UserMangmentClient interface {
 	StoreUser(ctx context.Context, in *StoreUserRequest, opts ...grpc.CallOption) (*StoreUserReply, error)
 	GetUser(ctx context.Context, in *GetUserRequest, opts ...grpc.CallOption) (*GetUserReply, error)
 	UploadImage(ctx context.Context, opts ...grpc.CallOption) (UserMangment_UploadImageClient, error)
+	FetchImage(ctx context.Context, in *FetchImageRequest, opts ...grpc.CallOption) (UserMangment_FetchImageClient, error)
 }
 
 type userMangmentClient struct {
@@ -93,6 +95,38 @@ func (x *userMangmentUploadImageClient) CloseAndRecv() (*UploadImageResponse, er
 	return m, nil
 }
 
+func (c *userMangmentClient) FetchImage(ctx context.Context, in *FetchImageRequest, opts ...grpc.CallOption) (UserMangment_FetchImageClient, error) {
+	stream, err := c.cc.NewStream(ctx, &UserMangment_ServiceDesc.Streams[1], UserMangment_FetchImage_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &userMangmentFetchImageClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type UserMangment_FetchImageClient interface {
+	Recv() (*FetchImageResponse, error)
+	grpc.ClientStream
+}
+
+type userMangmentFetchImageClient struct {
+	grpc.ClientStream
+}
+
+func (x *userMangmentFetchImageClient) Recv() (*FetchImageResponse, error) {
+	m := new(FetchImageResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // UserMangmentServer is the server API for UserMangment service.
 // All implementations must embed UnimplementedUserMangmentServer
 // for forward compatibility
@@ -100,6 +134,7 @@ type UserMangmentServer interface {
 	StoreUser(context.Context, *StoreUserRequest) (*StoreUserReply, error)
 	GetUser(context.Context, *GetUserRequest) (*GetUserReply, error)
 	UploadImage(UserMangment_UploadImageServer) error
+	FetchImage(*FetchImageRequest, UserMangment_FetchImageServer) error
 	mustEmbedUnimplementedUserMangmentServer()
 }
 
@@ -115,6 +150,9 @@ func (UnimplementedUserMangmentServer) GetUser(context.Context, *GetUserRequest)
 }
 func (UnimplementedUserMangmentServer) UploadImage(UserMangment_UploadImageServer) error {
 	return status.Errorf(codes.Unimplemented, "method UploadImage not implemented")
+}
+func (UnimplementedUserMangmentServer) FetchImage(*FetchImageRequest, UserMangment_FetchImageServer) error {
+	return status.Errorf(codes.Unimplemented, "method FetchImage not implemented")
 }
 func (UnimplementedUserMangmentServer) mustEmbedUnimplementedUserMangmentServer() {}
 
@@ -191,6 +229,27 @@ func (x *userMangmentUploadImageServer) Recv() (*UploadImageRequest, error) {
 	return m, nil
 }
 
+func _UserMangment_FetchImage_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(FetchImageRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(UserMangmentServer).FetchImage(m, &userMangmentFetchImageServer{stream})
+}
+
+type UserMangment_FetchImageServer interface {
+	Send(*FetchImageResponse) error
+	grpc.ServerStream
+}
+
+type userMangmentFetchImageServer struct {
+	grpc.ServerStream
+}
+
+func (x *userMangmentFetchImageServer) Send(m *FetchImageResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 // UserMangment_ServiceDesc is the grpc.ServiceDesc for UserMangment service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -212,6 +271,11 @@ var UserMangment_ServiceDesc = grpc.ServiceDesc{
 			StreamName:    "UploadImage",
 			Handler:       _UserMangment_UploadImage_Handler,
 			ClientStreams: true,
+		},
+		{
+			StreamName:    "FetchImage",
+			Handler:       _UserMangment_FetchImage_Handler,
+			ServerStreams: true,
 		},
 	},
 	Metadata: "generated/users_rpc.proto",

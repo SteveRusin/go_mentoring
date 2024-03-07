@@ -458,6 +458,134 @@ func (*UploadImageResponse_Error) isUploadImageResponse_Response() {}
 
 func (*UploadImageResponse_Id) isUploadImageResponse_Response() {}
 
+type FetchImageRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Id string `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+}
+
+func (x *FetchImageRequest) Reset() {
+	*x = FetchImageRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_generated_users_rpc_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FetchImageRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FetchImageRequest) ProtoMessage() {}
+
+func (x *FetchImageRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_generated_users_rpc_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FetchImageRequest.ProtoReflect.Descriptor instead.
+func (*FetchImageRequest) Descriptor() ([]byte, []int) {
+	return file_generated_users_rpc_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *FetchImageRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type FetchImageResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	// Types that are assignable to Data:
+	//
+	//	*FetchImageResponse_Info
+	//	*FetchImageResponse_ChunkData
+	Data isFetchImageResponse_Data `protobuf_oneof:"data"`
+}
+
+func (x *FetchImageResponse) Reset() {
+	*x = FetchImageResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_generated_users_rpc_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *FetchImageResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*FetchImageResponse) ProtoMessage() {}
+
+func (x *FetchImageResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_generated_users_rpc_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use FetchImageResponse.ProtoReflect.Descriptor instead.
+func (*FetchImageResponse) Descriptor() ([]byte, []int) {
+	return file_generated_users_rpc_proto_rawDescGZIP(), []int{8}
+}
+
+func (m *FetchImageResponse) GetData() isFetchImageResponse_Data {
+	if m != nil {
+		return m.Data
+	}
+	return nil
+}
+
+func (x *FetchImageResponse) GetInfo() *ImageInfo {
+	if x, ok := x.GetData().(*FetchImageResponse_Info); ok {
+		return x.Info
+	}
+	return nil
+}
+
+func (x *FetchImageResponse) GetChunkData() []byte {
+	if x, ok := x.GetData().(*FetchImageResponse_ChunkData); ok {
+		return x.ChunkData
+	}
+	return nil
+}
+
+type isFetchImageResponse_Data interface {
+	isFetchImageResponse_Data()
+}
+
+type FetchImageResponse_Info struct {
+	Info *ImageInfo `protobuf:"bytes,1,opt,name=info,proto3,oneof"`
+}
+
+type FetchImageResponse_ChunkData struct {
+	ChunkData []byte `protobuf:"bytes,2,opt,name=chunk_data,json=chunkData,proto3,oneof"`
+}
+
+func (*FetchImageResponse_Info) isFetchImageResponse_Data() {}
+
+func (*FetchImageResponse_ChunkData) isFetchImageResponse_Data() {}
+
 var File_generated_users_rpc_proto protoreflect.FileDescriptor
 
 var file_generated_users_rpc_proto_rawDesc = []byte{
@@ -494,7 +622,16 @@ var file_generated_users_rpc_proto_rawDesc = []byte{
 	0x12, 0x16, 0x0a, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x48,
 	0x00, 0x52, 0x05, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x12, 0x10, 0x0a, 0x02, 0x69, 0x64, 0x18, 0x02,
 	0x20, 0x01, 0x28, 0x09, 0x48, 0x00, 0x52, 0x02, 0x69, 0x64, 0x42, 0x0a, 0x0a, 0x08, 0x72, 0x65,
-	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x32, 0xe8, 0x01, 0x0a, 0x0c, 0x55, 0x73, 0x65, 0x72, 0x4d,
+	0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x23, 0x0a, 0x11, 0x46, 0x65, 0x74, 0x63, 0x68, 0x49,
+	0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x0e, 0x0a, 0x02, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x02, 0x69, 0x64, 0x22, 0x69, 0x0a, 0x12, 0x46,
+	0x65, 0x74, 0x63, 0x68, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x2a, 0x0a, 0x04, 0x69, 0x6e, 0x66, 0x6f, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32,
+	0x14, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x73, 0x5f, 0x72, 0x70, 0x63, 0x2e, 0x49, 0x6d, 0x61, 0x67,
+	0x65, 0x49, 0x6e, 0x66, 0x6f, 0x48, 0x00, 0x52, 0x04, 0x69, 0x6e, 0x66, 0x6f, 0x12, 0x1f, 0x0a,
+	0x0a, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x5f, 0x64, 0x61, 0x74, 0x61, 0x18, 0x02, 0x20, 0x01, 0x28,
+	0x0c, 0x48, 0x00, 0x52, 0x09, 0x63, 0x68, 0x75, 0x6e, 0x6b, 0x44, 0x61, 0x74, 0x61, 0x42, 0x06,
+	0x0a, 0x04, 0x64, 0x61, 0x74, 0x61, 0x32, 0xb7, 0x02, 0x0a, 0x0c, 0x55, 0x73, 0x65, 0x72, 0x4d,
 	0x61, 0x6e, 0x67, 0x6d, 0x65, 0x6e, 0x74, 0x12, 0x45, 0x0a, 0x09, 0x53, 0x74, 0x6f, 0x72, 0x65,
 	0x55, 0x73, 0x65, 0x72, 0x12, 0x1b, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x73, 0x5f, 0x72, 0x70, 0x63,
 	0x2e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x55, 0x73, 0x65, 0x72, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
@@ -509,11 +646,16 @@ var file_generated_users_rpc_proto_rawDesc = []byte{
 	0x64, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1e, 0x2e,
 	0x75, 0x73, 0x65, 0x72, 0x73, 0x5f, 0x72, 0x70, 0x63, 0x2e, 0x55, 0x70, 0x6c, 0x6f, 0x61, 0x64,
 	0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x28,
-	0x01, 0x42, 0x38, 0x5a, 0x36, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f,
-	0x53, 0x74, 0x65, 0x76, 0x65, 0x52, 0x75, 0x73, 0x69, 0x6e, 0x2f, 0x67, 0x6f, 0x5f, 0x6d, 0x65,
-	0x6e, 0x74, 0x6f, 0x72, 0x69, 0x6e, 0x67, 0x2f, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65,
-	0x64, 0x2f, 0x75, 0x73, 0x65, 0x72, 0x73, 0x5f, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f,
-	0x74, 0x6f, 0x33,
+	0x01, 0x12, 0x4d, 0x0a, 0x0a, 0x46, 0x65, 0x74, 0x63, 0x68, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x12,
+	0x1c, 0x2e, 0x75, 0x73, 0x65, 0x72, 0x73, 0x5f, 0x72, 0x70, 0x63, 0x2e, 0x46, 0x65, 0x74, 0x63,
+	0x68, 0x49, 0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e,
+	0x75, 0x73, 0x65, 0x72, 0x73, 0x5f, 0x72, 0x70, 0x63, 0x2e, 0x46, 0x65, 0x74, 0x63, 0x68, 0x49,
+	0x6d, 0x61, 0x67, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x30, 0x01,
+	0x42, 0x38, 0x5a, 0x36, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x53,
+	0x74, 0x65, 0x76, 0x65, 0x52, 0x75, 0x73, 0x69, 0x6e, 0x2f, 0x67, 0x6f, 0x5f, 0x6d, 0x65, 0x6e,
+	0x74, 0x6f, 0x72, 0x69, 0x6e, 0x67, 0x2f, 0x67, 0x65, 0x6e, 0x65, 0x72, 0x61, 0x74, 0x65, 0x64,
+	0x2f, 0x75, 0x73, 0x65, 0x72, 0x73, 0x5f, 0x72, 0x70, 0x63, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74,
+	0x6f, 0x33,
 }
 
 var (
@@ -528,7 +670,7 @@ func file_generated_users_rpc_proto_rawDescGZIP() []byte {
 	return file_generated_users_rpc_proto_rawDescData
 }
 
-var file_generated_users_rpc_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_generated_users_rpc_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
 var file_generated_users_rpc_proto_goTypes = []interface{}{
 	(*StoreUserRequest)(nil),    // 0: users_rpc.StoreUserRequest
 	(*StoreUserReply)(nil),      // 1: users_rpc.StoreUserReply
@@ -537,20 +679,25 @@ var file_generated_users_rpc_proto_goTypes = []interface{}{
 	(*UploadImageRequest)(nil),  // 4: users_rpc.UploadImageRequest
 	(*ImageInfo)(nil),           // 5: users_rpc.ImageInfo
 	(*UploadImageResponse)(nil), // 6: users_rpc.UploadImageResponse
+	(*FetchImageRequest)(nil),   // 7: users_rpc.FetchImageRequest
+	(*FetchImageResponse)(nil),  // 8: users_rpc.FetchImageResponse
 }
 var file_generated_users_rpc_proto_depIdxs = []int32{
 	5, // 0: users_rpc.UploadImageRequest.info:type_name -> users_rpc.ImageInfo
-	0, // 1: users_rpc.UserMangment.StoreUser:input_type -> users_rpc.StoreUserRequest
-	2, // 2: users_rpc.UserMangment.GetUser:input_type -> users_rpc.GetUserRequest
-	4, // 3: users_rpc.UserMangment.UploadImage:input_type -> users_rpc.UploadImageRequest
-	1, // 4: users_rpc.UserMangment.StoreUser:output_type -> users_rpc.StoreUserReply
-	3, // 5: users_rpc.UserMangment.GetUser:output_type -> users_rpc.GetUserReply
-	6, // 6: users_rpc.UserMangment.UploadImage:output_type -> users_rpc.UploadImageResponse
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	5, // 1: users_rpc.FetchImageResponse.info:type_name -> users_rpc.ImageInfo
+	0, // 2: users_rpc.UserMangment.StoreUser:input_type -> users_rpc.StoreUserRequest
+	2, // 3: users_rpc.UserMangment.GetUser:input_type -> users_rpc.GetUserRequest
+	4, // 4: users_rpc.UserMangment.UploadImage:input_type -> users_rpc.UploadImageRequest
+	7, // 5: users_rpc.UserMangment.FetchImage:input_type -> users_rpc.FetchImageRequest
+	1, // 6: users_rpc.UserMangment.StoreUser:output_type -> users_rpc.StoreUserReply
+	3, // 7: users_rpc.UserMangment.GetUser:output_type -> users_rpc.GetUserReply
+	6, // 8: users_rpc.UserMangment.UploadImage:output_type -> users_rpc.UploadImageResponse
+	8, // 9: users_rpc.UserMangment.FetchImage:output_type -> users_rpc.FetchImageResponse
+	6, // [6:10] is the sub-list for method output_type
+	2, // [2:6] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_generated_users_rpc_proto_init() }
@@ -643,6 +790,30 @@ func file_generated_users_rpc_proto_init() {
 				return nil
 			}
 		}
+		file_generated_users_rpc_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FetchImageRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_generated_users_rpc_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*FetchImageResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
 	file_generated_users_rpc_proto_msgTypes[4].OneofWrappers = []interface{}{
 		(*UploadImageRequest_Info)(nil),
@@ -652,13 +823,17 @@ func file_generated_users_rpc_proto_init() {
 		(*UploadImageResponse_Error)(nil),
 		(*UploadImageResponse_Id)(nil),
 	}
+	file_generated_users_rpc_proto_msgTypes[8].OneofWrappers = []interface{}{
+		(*FetchImageResponse_Info)(nil),
+		(*FetchImageResponse_ChunkData)(nil),
+	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_generated_users_rpc_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

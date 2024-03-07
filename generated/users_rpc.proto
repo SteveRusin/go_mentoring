@@ -43,8 +43,20 @@ message UploadImageResponse {
   }
 }
 
+message FetchImageRequest {
+  string id = 1;
+}
+
+message FetchImageResponse {
+  oneof data {
+    ImageInfo info = 1;
+    bytes chunk_data = 2;
+  }
+}
+
 service UserMangment {
   rpc StoreUser (StoreUserRequest) returns (StoreUserReply) {}
   rpc GetUser (GetUserRequest) returns (GetUserReply) {}
   rpc UploadImage (stream UploadImageRequest) returns (UploadImageResponse) {}
+  rpc FetchImage (FetchImageRequest) returns (stream FetchImageResponse) {}
 }
