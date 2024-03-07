@@ -46,7 +46,18 @@ func main() {
 		middlewares.CatchPanicMiddleware(
 			middlewares.LogHttpMiddleware(
 				middlewares.ErrorMiddleware(
-					imageHandler.Image,
+					imageHandler.PostImage,
+				),
+			),
+		),
+	)
+
+	mux.Handle(
+		"/image/",
+		middlewares.CatchPanicMiddleware(
+			middlewares.LogHttpMiddleware(
+				middlewares.ErrorMiddleware(
+					imageHandler.GetImage,
 				),
 			),
 		),

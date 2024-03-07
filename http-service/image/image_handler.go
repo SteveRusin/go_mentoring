@@ -23,7 +23,11 @@ func NewImageHandlers() *imageHandlers {
 	}
 }
 
-func (handler *imageHandlers) postImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+func (handler *imageHandlers) PostImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+  if r.Method != http.MethodPost {
+    return middlewares.NewNotImplementedError()
+  }
+
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20) // 10 MB limit
 	defer r.Body.Close()
 
@@ -111,20 +115,45 @@ func (handler *imageHandlers) postImage(w http.ResponseWriter, r *http.Request) 
 	return nil
 }
 
-func (hander *imageHandlers) getImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-  imgId := r.URL.Path[len("/image/"):]
-  log.Println("Fetching image", imgId)
-  return middlewares.NewNotImplementedError()
-}
-
-func (handler *imageHandlers) Image(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-	if r.Method == "POST" {
-		return handler.postImage(w, r)
-	}
-
-  if r.Method == "GET" {
-    return handler.getImage(w, r)
+func (hander *imageHandlers) GetImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+  if r.Method != http.MethodGet {
+    return middlewares.NewNotImplementedError()
   }
 
-  return middlewares.NewNotImplementedError()
+  pathSlice := strings.Split(r.URL.Path, "/")
+  // e.g. /image/123
+  if len(pathSlice) != 3 {
+    return middlewares.NewBadRequestError()
+  }
+
+  imgId := pathSlice[2]
+  
+  client, err := hander.userClient.NewFetchImageClient(context.TODO(), &users_rpc.FetchImageRequest{Id: imgId})
+  if err != nil {
+    return middlewares.NewBadRequestError()
+  }
+
+  for {
+    resp, err := client.Recv()
+
+    if err == io.EOF {
+      log.Println("EOF: Done receiving chunks")
+      break
+    }
+
+    if err != nil {
+      log.Println("Error reading chunk", err)
+
+      return middlewares.NewBadRequestError()
+    }
+
+    info := resp.GetInfo()
+    log.Println(info)
+    log.Println("Received", info.GetFileSize(), "bytes")
+
+  }
+
+  log.Println("Done receiving image")
+  return nil
 }
+
