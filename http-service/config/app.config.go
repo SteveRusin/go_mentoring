@@ -11,12 +11,12 @@ var config *appConfig
 func GetAppConfig() *appConfig {
 	if config == nil {
 		config = &appConfig{
-      Host: os.Getenv("HOST"),
+			Host: os.Getenv("HOST"),
 		}
 
-    if config.Host == "" {
-      config.Host = "0.0.0.0"
-    }
+		if config.Host == "" {
+			config.Host = "0.0.0.0"
+		}
 	}
 
 	return config

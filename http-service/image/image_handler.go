@@ -24,9 +24,9 @@ func NewImageHandlers() *imageHandlers {
 }
 
 func (handler *imageHandlers) PostImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-  if r.Method != http.MethodPost {
-    return middlewares.NewNotImplementedError()
-  }
+	if r.Method != http.MethodPost {
+		return middlewares.NewNotImplementedError()
+	}
 
 	r.Body = http.MaxBytesReader(w, r.Body, 10<<20) // 10 MB limit
 	defer r.Body.Close()
@@ -37,14 +37,16 @@ func (handler *imageHandlers) PostImage(w http.ResponseWriter, r *http.Request) 
 	buffer := make([]byte, chunkSize)
 	client, err := handler.userClient.NewUploadImageClient(context.Background())
 	if err != nil {
+		log.Println("error creating client", err)
 		return middlewares.NewBadRequestError()
 	}
 
 	totalSent := uint32(0)
-  fileTypeSlice := strings.Split(r.Header.Get("Content-Type"), "/")
-  if len(fileTypeSlice) != 2 || fileTypeSlice[0] != "image" {
-    return middlewares.NewBadRequestError()
-  }
+	fileTypeSlice := strings.Split(r.Header.Get("Content-Type"), "/")
+	if len(fileTypeSlice) != 2 || fileTypeSlice[0] != "image" {
+		log.Println("Expected image type but got:", r.Header.Get("Content-Type"))
+		return middlewares.NewBadRequestError()
+	}
 
 	imgInfo := &users_rpc.UploadImageRequest{
 		Data: &users_rpc.UploadImageRequest_Info{
@@ -116,44 +118,55 @@ func (handler *imageHandlers) PostImage(w http.ResponseWriter, r *http.Request) 
 }
 
 func (hander *imageHandlers) GetImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
-  if r.Method != http.MethodGet {
-    return middlewares.NewNotImplementedError()
-  }
+	if r.Method != http.MethodGet {
+		return middlewares.NewNotImplementedError()
+	}
 
-  pathSlice := strings.Split(r.URL.Path, "/")
-  // e.g. /image/123
-  if len(pathSlice) != 3 {
-    return middlewares.NewBadRequestError()
-  }
+	pathSlice := strings.Split(r.URL.Path, "/")
+	// e.g. /image/123
+	if len(pathSlice) != 3 {
+		return middlewares.NewBadRequestError()
+	}
 
-  imgId := pathSlice[2]
-  
-  client, err := hander.userClient.NewFetchImageClient(context.TODO(), &users_rpc.FetchImageRequest{Id: imgId})
-  if err != nil {
-    return middlewares.NewBadRequestError()
-  }
+	imgId := pathSlice[2]
 
-  for {
-    resp, err := client.Recv()
+	client, err := hander.userClient.NewFetchImageClient(context.TODO(), &users_rpc.FetchImageRequest{Id: imgId})
+	if err != nil {
+		return middlewares.NewBadRequestError()
+	}
 
-    if err == io.EOF {
-      log.Println("EOF: Done receiving chunks")
-      break
-    }
+	for {
+		resp, err := client.Recv()
 
-    if err != nil {
-      log.Println("Error reading chunk", err)
+		if err == io.EOF {
+			log.Println("EOF: Done receiving chunks")
+			break
+		}
 
-      return middlewares.NewBadRequestError()
-    }
+		if err != nil {
+			log.Println("Error reading chunk", err)
 
-    info := resp.GetInfo()
-    log.Println(info)
-    log.Println("Received", info.GetFileSize(), "bytes")
+			return middlewares.NewBadRequestError()
+		}
 
-  }
+		fetchError := resp.GetError()
+		if fetchError != "" {
+			println("Error receiving image:", fetchError)
+			return middlewares.NewBadRequestError()
+		}
+		chunk := resp.GetChunkData()
 
-  log.Println("Done receiving image")
-  return nil
+		if chunk == nil {
+			println("No more data to fetch")
+			break
+		}
+
+		_, err = w.Write(chunk)
+		if err != nil {
+			log.Println("Error writing to response", err)
+			return middlewares.NewBadRequestError()
+		}
+	}
+
+	return nil
 }
-

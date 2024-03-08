@@ -14,7 +14,7 @@ type (
 		Save(user *users_rpc.StoreUserRequest) (*users_rpc.StoreUserReply, error)
 		FindUserByCreds(creds *users_rpc.GetUserRequest) (*users_rpc.GetUserReply, error)
 		NewUploadImageClient(ctx context.Context, opts ...grpc.CallOption) (users_rpc.UserMangment_UploadImageClient, error)
-    NewFetchImageClient(ctx context.Context, in *users_rpc.FetchImageRequest, opts ...grpc.CallOption) (users_rpc.UserMangment_FetchImageClient, error)
+		NewFetchImageClient(ctx context.Context, in *users_rpc.FetchImageRequest, opts ...grpc.CallOption) (users_rpc.UserMangment_FetchImageClient, error)
 	}
 )
 
@@ -50,5 +50,5 @@ func (uc *UserRpcClient) NewUploadImageClient(ctx context.Context, opts ...grpc.
 }
 
 func (uc *UserRpcClient) NewFetchImageClient(ctx context.Context, in *users_rpc.FetchImageRequest, opts ...grpc.CallOption) (users_rpc.UserMangment_FetchImageClient, error) {
-  return uc.client.FetchImage(ctx, in, opts...)
+	return uc.client.FetchImage(ctx, in, opts...)
 }

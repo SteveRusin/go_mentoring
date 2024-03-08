@@ -18,7 +18,7 @@ To start the project, follow these steps:
 1. Run `make dev-http-service` - to start http api
 1. Run `make dev-user-managment-service` - to start gRPC server
 1. Run `make build-proto` - to generate gRPC client and server from generated folder
-<!-- todo add example how to build rpc and update docker examples -->
+<!-- todo add example how to build rpc and update docker examples if that's not time consuming -->
 
 ## Example Requests
 

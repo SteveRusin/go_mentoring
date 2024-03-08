@@ -49,8 +49,8 @@ message FetchImageRequest {
 
 message FetchImageResponse {
   oneof data {
-    ImageInfo info = 1;
-    bytes chunk_data = 2;
+    bytes chunk_data = 1;
+    string error = 2;
   }
 }
 

@@ -2,9 +2,11 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"io"
 	"log"
 	"os"
+	"strings"
 
 	users_rpc "github.com/SteveRusin/go_mentoring/generated"
 	"github.com/SteveRusin/go_mentoring/user-management-service/randomId"
@@ -146,15 +148,64 @@ func (s *Server) UploadImage(stream users_rpc.UserMangment_UploadImageServer) er
 
 	return stream.SendAndClose(&users_rpc.UploadImageResponse{
 		Response: &users_rpc.UploadImageResponse_Id{
-			Id: fileId,
+			Id: fileId + "." + imgType,
 		},
 	})
 }
 
 func (s *Server) FetchImage(req *users_rpc.FetchImageRequest, stream users_rpc.UserMangment_FetchImageServer) error {
-  log.Println("Fetching image", req.GetId())
-  // todo implement
-  return nil
+	image := strings.Trim(req.GetId(), " ")
+	log.Println("Fetching image", image)
+
+	if image == "" {
+		return stream.Send(&users_rpc.FetchImageResponse{
+			Data: &users_rpc.FetchImageResponse_Error{
+				Error: "Image id is epmty",
+			},
+		})
+	}
+
+	file, err := os.Open("images/" + image)
+	if err != nil {
+		log.Println("Error opening file", err)
+		return stream.Send(&users_rpc.FetchImageResponse{
+			Data: &users_rpc.FetchImageResponse_Error{
+				Error: "Image does not exist",
+			},
+		})
+	}
+	defer file.Close()
+
+	chunkSize := 1024
+
+	buffer := make([]byte, chunkSize)
+
+	for {
+		bytesRead, err := file.Read(buffer)
+		if err != nil && err != io.EOF {
+			fmt.Println("Error:", err)
+			return stream.Send(&users_rpc.FetchImageResponse{
+				Data: &users_rpc.FetchImageResponse_Error{
+					Error: "Error reading chunk",
+				},
+			})
+		}
+
+		if bytesRead == 0 || err == io.EOF {
+			println("No more data to read")
+			break
+		}
+
+		err = stream.Send(&users_rpc.FetchImageResponse{
+			Data: &users_rpc.FetchImageResponse_ChunkData{ChunkData: buffer[:bytesRead]},
+		})
+		if err != nil {
+			fmt.Println("Error sending chunk:", err)
+			break
+		}
+	}
+
+	return nil
 }
 
 func cleanUpFile(filePath string) {
