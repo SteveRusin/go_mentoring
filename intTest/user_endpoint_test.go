@@ -6,7 +6,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SteveRusin/go_mentoring/users"
+	"github.com/SteveRusin/go_mentoring/http-service/users"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 )
