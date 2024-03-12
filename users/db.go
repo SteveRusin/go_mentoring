@@ -24,7 +24,7 @@ func UserDBConnect() *gorm.DB {
 	config := config.GetUserDbConfig()
 
 	db, err := gorm.Open(postgres.New(postgres.Config{
-		DSN: fmt.Sprintf("host=localhost  user=%s password=%s", config.User, config.Password),
+		DSN: fmt.Sprintf("host=%s  user=%s password=%s", config.Host, config.User, config.Password),
 	}))
 	if err != nil {
 		panic("Unable to connect to users database")

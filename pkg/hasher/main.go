@@ -21,22 +21,36 @@ SOFTWARE.
 */
 package hasher
 
+import (
+	"crypto/sha256"
+	"encoding/hex"
+)
+
 /*
-  Hashes password
-  Usage:
-    import "github.com/SteveRusin/go_mentoring/hasher"
-    hasher.HashPassword("password")
+Hashes password
+Usage:
+
+	import "github.com/SteveRusin/go_mentoring/hasher"
+	hasher.HashPassword("password")
 */
 func HashPassword(password string) (string, error) {
-    return "hashed password", nil
+	hasher := sha256.New()
+	_, err := hasher.Write([]byte(password))
+	if err != nil {
+		return "", err
+	}
+	hashPwd := hasher.Sum(nil)
+
+  return hex.EncodeToString(hashPwd), nil
 }
 
 /*
-  Verifies password hash
-  Usage:
-    import "github.com/SteveRusin/go_mentoring/hasher"
-    hasher.HashPassword("password")
+Verifies password hash
+Usage:
+
+	import "github.com/SteveRusin/go_mentoring/hasher"
+	hasher.HashPassword("password")
 */
 func CheckPasswordHash(password, hash string) bool {
-    return true
+	return true
 }
