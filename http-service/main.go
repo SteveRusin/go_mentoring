@@ -10,7 +10,6 @@ import (
 	"github.com/SteveRusin/go_mentoring/http-service/image"
 	"github.com/SteveRusin/go_mentoring/http-service/users"
 	_ "github.com/joho/godotenv/autoload" // read .env file
-	"golang.org/x/net/websocket"
 
 	"github.com/SteveRusin/go_mentoring/http-service/middlewares"
 )
@@ -68,7 +67,24 @@ func main() {
 
 	mux.Handle(
 		"/chat",
-		websocket.Handler(chatHandler.Connect),
+		middlewares.CatchPanicMiddleware(
+			middlewares.LogHttpMiddleware(
+				middlewares.ErrorMiddleware(
+					users.AuthChatUser(chatHandler.Connect),
+				),
+			),
+		),
+	)
+
+	mux.Handle(
+		"/users",
+		middlewares.CatchPanicMiddleware(
+			middlewares.LogHttpMiddleware(
+				middlewares.ErrorMiddleware(
+					usersHandler.GetActiveUsers,
+				),
+			),
+		),
 	)
 
 	host := fmt.Sprintf("%s:8080", config.GetAppConfig().Host)

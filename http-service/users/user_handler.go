@@ -2,10 +2,12 @@ package users
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 
 	users_rpc "github.com/SteveRusin/go_mentoring/generated"
 	"github.com/SteveRusin/go_mentoring/http-service/middlewares"
+	"github.com/SteveRusin/go_mentoring/user-management-service/randomId"
 )
 
 type RegisterUserDto struct {
@@ -25,12 +27,14 @@ type LoginUserResponse struct {
 }
 
 type userHandlers struct {
-	userClient UserClient
+	userClient    UserClient
+	activeUsersDb *activeUsers
 }
 
 func NewUserHandlers() *userHandlers {
 	return &userHandlers{
-		userClient: NewUserRpcClient(),
+		userClient:    NewUserRpcClient(),
+		activeUsersDb: newUsersActiveDb(),
 	}
 }
 
@@ -89,11 +93,42 @@ func (handler *userHandlers) UserLogin(w http.ResponseWriter, r *http.Request) *
 		return middlewares.NewBadRequestError()
 	}
 
+	token := randomId.New()
+
+	handler.activeUsersDb.AddToken(loginUserDto.UserName, token)
+
 	response := LoginUserResponse{
-		Url: "ws://mock.url.io/token=.....",
+		Url: "ws://localhost:8080/chat?token=" + token,
 	}
 
-	json.NewEncoder(w).Encode(response)
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		handler.activeUsersDb.RevokeToken(loginUserDto.UserName)
+		log.Println("Error while encoding response", err)
+		return nil
+	}
+
+	return nil
+}
+
+type ActiveUsersResponse struct {
+	Users []string `json:"users"`
+}
+
+func (handler *userHandlers) GetActiveUsers(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+	if r.Method != "GET" {
+		return middlewares.NewNotImplementedError()
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+
+	activeUsers := handler.activeUsersDb.GetActiveUsers()
+
+	activeUsersResponse := ActiveUsersResponse{
+		Users: activeUsers,
+	}
+
+	json.NewEncoder(w).Encode(activeUsersResponse)
 
 	return nil
 }
