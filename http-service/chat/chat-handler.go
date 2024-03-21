@@ -32,7 +32,7 @@ func (h *chatHandlers) Connect(ws *websocket.Conn) {
 		}
 	}()
 
-  h.sendUnreadMesages(user)
+	h.sendUnreadMesages(user)
 
 	for {
 		err := h.receiveMessage(ws, user)
@@ -43,18 +43,18 @@ func (h *chatHandlers) Connect(ws *websocket.Conn) {
 }
 
 func (h *chatHandlers) sendUnreadMesages(user string) {
-  messages, err := h.messagesRepository.FindAllExcept(user)
-  if err != nil {
-    log.Println("Error finding messages:", err)
-    return
-  }
+	messages, err := h.messagesRepository.FindAllExcept(user)
+	if err != nil {
+		log.Println("Error finding messages:", err)
+		return
+	}
 
-  ws := h.connectionsByUser[user]
-  for _, message := range messages {
-    go h.sendMessageTo(ws, message.UserId, message.Text)
-    // mark as read
-    // what would be a good design for this?
-  }
+	ws := h.connectionsByUser[user]
+	for _, message := range messages {
+		go h.sendMessageTo(ws, message.UserId, message.Text)
+		// mark as read
+		// what would be a good design for this?
+	}
 }
 
 func (h *chatHandlers) receiveMessage(ws *websocket.Conn, user string) error {
@@ -65,17 +65,16 @@ func (h *chatHandlers) receiveMessage(ws *websocket.Conn, user string) error {
 		return err
 	}
 
-  // is this okay???
+	// is this okay???
 	go h.fanOutMessage(user, message)
-  go func() {
-    err := h.messagesRepository.Save(user, message)
+	go func() {
+		err := h.messagesRepository.Save(user, message)
+		if err != nil {
+			log.Println("Error saving message:", err)
+		}
+	}()
 
-    if err != nil {
-      log.Println("Error saving message:", err)
-    }
-  }()
-
-  return nil
+	return nil
 }
 
 func (h *chatHandlers) fanOutMessage(user string, message string) {

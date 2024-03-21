@@ -36,8 +36,8 @@ func AuthChatUser(handler chatHandler) middlewares.HanderFunc {
 
 		db.RevokeToken(token)
 
-    ctx := context.WithValue(r.Context(), "user", userName)
-    r = r.WithContext(ctx)
+		ctx := context.WithValue(r.Context(), "user", userName)
+		r = r.WithContext(ctx)
 		websocket.Handler(handler).ServeHTTP(w, r)
 
 		return nil
