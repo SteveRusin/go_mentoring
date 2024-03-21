@@ -3,16 +3,19 @@ package chat
 import (
 	"log"
 
+	"github.com/SteveRusin/go_mentoring/http-service/messages"
 	"golang.org/x/net/websocket"
 )
 
 type chatHandlers struct {
-	connectionsByUser map[string]*websocket.Conn
+	connectionsByUser  map[string]*websocket.Conn
+	messagesRepository *messages.MessageRepository
 }
 
 func NewChatHandlers() *chatHandlers {
 	return &chatHandlers{
-		connectionsByUser: make(map[string]*websocket.Conn),
+		connectionsByUser:  make(map[string]*websocket.Conn),
+		messagesRepository: messages.NewMessageRepository(),
 	}
 }
 
@@ -29,28 +32,63 @@ func (h *chatHandlers) Connect(ws *websocket.Conn) {
 		}
 	}()
 
+  h.sendUnreadMesages(user)
+
 	for {
-		var message string
-		err := websocket.Message.Receive(ws, &message)
+		err := h.receiveMessage(ws, user)
 		if err != nil {
-			log.Println("Error receiving message:", err)
 			break
 		}
-		h.fanOutMessage(user, message)
 	}
+}
+
+func (h *chatHandlers) sendUnreadMesages(user string) {
+  messages, err := h.messagesRepository.FindAllExcept(user)
+  if err != nil {
+    log.Println("Error finding messages:", err)
+    return
+  }
+
+  ws := h.connectionsByUser[user]
+  for _, message := range messages {
+    go h.sendMessageTo(ws, message.UserId, message.Text)
+    // mark as read
+    // what would be a good design for this?
+  }
+}
+
+func (h *chatHandlers) receiveMessage(ws *websocket.Conn, user string) error {
+	var message string
+	err := websocket.Message.Receive(ws, &message)
+	if err != nil {
+		log.Println("Error receiving message:", err)
+		return err
+	}
+
+  // is this okay???
+	go h.fanOutMessage(user, message)
+  go func() {
+    err := h.messagesRepository.Save(user, message)
+
+    if err != nil {
+      log.Println("Error saving message:", err)
+    }
+  }()
+
+  return nil
 }
 
 func (h *chatHandlers) fanOutMessage(user string, message string) {
 	for u, ws := range h.connectionsByUser {
 		if u != user {
-      go h.sendMessageTo(ws, user, message)
+			go h.sendMessageTo(ws, user, message)
 		}
 	}
 }
 
 func (h *chatHandlers) sendMessageTo(ws *websocket.Conn, user string, message string) {
-  err := websocket.Message.Send(ws, message)
-  if err != nil {
-    log.Println("Error sending message:", err)
-  }
+	err := websocket.Message.Send(ws, message)
+	if err != nil {
+		log.Println("Error sending message:", err)
+	}
 }
