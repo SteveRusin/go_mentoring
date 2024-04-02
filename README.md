@@ -14,6 +14,12 @@ To start the project, follow these steps:
 
 2. The service will be available on `localhost:3000`.
 
+## Local developments
+1. Run `make dev-http-service` - to start http api
+1. Run `make dev-user-managment-service` - to start gRPC server
+1. Run `make build-proto` - to generate gRPC client and server from generated folder
+<!-- todo add example how to build rpc and update docker examples if that's not time consuming -->
+
 ## Example Requests
 
 ### Create a User
@@ -34,13 +40,3 @@ curl -X POST localhost:8080/user/login \
 
 Make sure to replace `"userName"` and `"password"` with your desired values.
 
-## Testing
-### Unit tests
-execute `go test -v ./users`
-
-### Inegration tests
-execute `docker compose -f docker-compose.integration.yml up api` to start databases and api
-and run `go test -v ./intTest` to run actual tests
-
-### Benchmark tests
-execute `go test -bench=. ./pkg/hasher/.` to run tests for hasher package

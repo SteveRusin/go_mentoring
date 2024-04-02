@@ -1,18 +1,5 @@
 version: '3'
 services:
-  api:
-    build: .
-    ports:
-      - "8080:8080"
-    environment:
-      - POSTGRES_HOST=users-db
-      - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=123
-      - MONGO_USER=root
-      - MONGO_PASSWORD=123
-    depends_on:
-      - users-db
-      - messages-db
   users-db:
     image: postgres:14
     ports:
