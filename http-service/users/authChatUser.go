@@ -1,6 +1,7 @@
 package users
 
 import (
+	"context"
 	"log"
 	"net/http"
 
@@ -35,7 +36,8 @@ func AuthChatUser(handler chatHandler) middlewares.HanderFunc {
 
 		db.RevokeToken(token)
 
-		// how to pass active user data to the websocket handler?
+		ctx := context.WithValue(r.Context(), "user", userName)
+		r = r.WithContext(ctx)
 		websocket.Handler(handler).ServeHTTP(w, r)
 
 		return nil
