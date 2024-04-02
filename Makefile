@@ -10,3 +10,5 @@ http-service:
 
 user-service:
 	cd user-management-service && air
+benchmark:
+	ab -n 100 -c 10 -p /dev/null http://127.0.0.1:8080/user/image
