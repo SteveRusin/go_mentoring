@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/SteveRusin/go_mentoring/http-service/chat"
 	"github.com/SteveRusin/go_mentoring/http-service/config"
 	"github.com/SteveRusin/go_mentoring/http-service/image"
 	"github.com/SteveRusin/go_mentoring/http-service/users"
@@ -18,6 +19,7 @@ func main() {
 
 	usersHandler := users.NewUserHandlers()
 	imageHandler := image.NewImageHandlers()
+	chatHandler := chat.NewChatHandlers()
 
 	mux.Handle(
 		"/user",
@@ -58,6 +60,28 @@ func main() {
 			middlewares.LogHttpMiddleware(
 				middlewares.ErrorMiddleware(
 					imageHandler.GetImage,
+				),
+			),
+		),
+	)
+
+	mux.Handle(
+		"/chat",
+		middlewares.CatchPanicMiddleware(
+			middlewares.LogHttpMiddleware(
+				middlewares.ErrorMiddleware(
+					users.AuthChatUser(chatHandler.Connect),
+				),
+			),
+		),
+	)
+
+	mux.Handle(
+		"/users",
+		middlewares.CatchPanicMiddleware(
+			middlewares.LogHttpMiddleware(
+				middlewares.ErrorMiddleware(
+					usersHandler.GetActiveUsers,
 				),
 			),
 		),

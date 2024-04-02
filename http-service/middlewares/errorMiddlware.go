@@ -10,9 +10,9 @@ type HttpError struct {
 	body       string
 }
 
-type handerFunc func(w http.ResponseWriter, r *http.Request) *HttpError
+type HanderFunc func(w http.ResponseWriter, r *http.Request) *HttpError
 
-func ErrorMiddleware(next handerFunc) http.Handler {
+func ErrorMiddleware(next HanderFunc) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if err := next(w, r); err != nil {
 			slog.Error(err.body, "statusCode", err.statusCode)
@@ -35,5 +35,12 @@ func NewBadRequestError() *HttpError {
 	return &HttpError{
 		statusCode: http.StatusBadRequest,
 		body:       "Bad request",
+	}
+}
+
+func NewUnauthorizedError() *HttpError {
+	return &HttpError{
+		statusCode: http.StatusUnauthorized,
+		body:       "Unauthorized",
 	}
 }
