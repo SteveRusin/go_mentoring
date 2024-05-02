@@ -1,9 +1,14 @@
 package users
 
 import (
+	"crypto/md5"
+	"encoding/hex"
 	"encoding/json"
+	"fmt"
+	"io"
 	"log"
 	"net/http"
+	"os"
 
 	users_rpc "github.com/SteveRusin/go_mentoring/generated"
 	"github.com/SteveRusin/go_mentoring/http-service/middlewares"
@@ -36,6 +41,33 @@ func NewUserHandlers() *userHandlers {
 		userClient:    NewUserRpcClient(),
 		activeUsersDb: newUsersActiveDb(),
 	}
+}
+
+// https://hackernoon.com/go-the-complete-guide-to-profiling-your-code-h51r3waz
+func (handler *userHandlers) ProcessImage(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {
+	file, err := os.Open("../upload_example.jpg")
+	if err != nil {
+		log.Println("Error while opening file", err)
+		return middlewares.NewBadRequestError()
+	}
+	defer file.Close()
+
+	hash := md5.New()
+
+	if _, err := io.Copy(hash, file); err != nil {
+		fmt.Println("Error hashing file:", err)
+		return middlewares.NewBadRequestError()
+	}
+
+	hashInBytes := hash.Sum(nil)
+
+	hashString := hex.EncodeToString(hashInBytes)
+
+	fmt.Println("MD5 hash:", hashString)
+
+	w.Write([]byte(hashString))
+
+	return nil
 }
 
 func (handler *userHandlers) User(w http.ResponseWriter, r *http.Request) *middlewares.HttpError {

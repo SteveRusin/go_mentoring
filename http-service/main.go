@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log/slog"
 	"net/http"
+	"net/http/pprof"
 
 	"github.com/SteveRusin/go_mentoring/http-service/chat"
 	"github.com/SteveRusin/go_mentoring/http-service/config"
@@ -21,12 +22,29 @@ func main() {
 	imageHandler := image.NewImageHandlers()
 	chatHandler := chat.NewChatHandlers()
 
+	mux.HandleFunc("/debug/pprof/", pprof.Index)
+	mux.HandleFunc("/debug/pprof/cmdline", pprof.Cmdline)
+	mux.HandleFunc("/debug/pprof/profile", pprof.Profile)
+	mux.HandleFunc("/debug/pprof/symbol", pprof.Symbol)
+	mux.HandleFunc("/debug/pprof/trace", pprof.Trace)
+
 	mux.Handle(
 		"/user",
 		middlewares.CatchPanicMiddleware(
 			middlewares.LogHttpMiddleware(
 				middlewares.ErrorMiddleware(
 					usersHandler.User,
+				),
+			),
+		),
+	)
+
+	mux.Handle(
+		"/user/image",
+		middlewares.CatchPanicMiddleware(
+			middlewares.LogHttpMiddleware(
+				middlewares.ErrorMiddleware(
+					usersHandler.ProcessImage,
 				),
 			),
 		),
